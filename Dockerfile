@@ -8,7 +8,7 @@ ENV GOARCH=amd64
 ENV CGO_ENABLED=0
 
 COPY . .
-RUN go build -mod=vendor -v -o /opt/Yearning main.go
+RUN go build -v -o /opt/Yearning main.go
 
 FROM alpine:3.15
 

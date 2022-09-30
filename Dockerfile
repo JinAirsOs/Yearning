@@ -20,7 +20,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && cp -rf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "Asia/Shanghai" > /etc/timezone
 
-COPY --from=builder /opt/Yearning /opt/Yearning
+COPY --from=build /opt/Yearning /opt/Yearning
 COPY conf.toml.template /opt/conf.toml
 
 WORKDIR /opt/

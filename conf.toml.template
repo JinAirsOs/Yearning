@@ -1,8 +1,8 @@
 [Mysql]
-Db = "Yearning_go"
+Db = "Yearning_db"
 Host = "127.0.0.1"
 Port = "3306"
-Password = "xxxxxxx"
+Password = "root"
 User = "root"
 
 [General]

@@ -6,6 +6,7 @@ ENV GIN_MODE=release
 ENV GOOS=linux
 ENV GOARCH=amd64
 ENV CGO_ENABLED=0
+ENV GOPROXY=https://goproxy.cn,direct
 
 COPY . .
 RUN go build -v -o /opt/Yearning main.go
@@ -21,7 +22,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && echo "Asia/Shanghai" > /etc/timezone
 
 COPY --from=build /opt/Yearning /opt/Yearning
-COPY conf.toml.template /opt/conf.toml
+COPY conf.toml /opt/conf.toml
 
 WORKDIR /opt/
 

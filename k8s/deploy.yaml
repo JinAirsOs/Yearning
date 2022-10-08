@@ -16,7 +16,7 @@ spec:
         app: yearning
     spec:
       containers:
-        - image: adas-hub.nioint.com/yearning:v0.3
+        - image: repositories.nioint.com/adas/yearning:v0.3.0
           name: yearning
           imagePullPolicy: Always
           command:
@@ -54,7 +54,7 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 2
-        - image: adas-hub.nioint.com/juno:v0.1
+        - image: repositories.nioint.com/adas/juno:v0.1
           name: juno
           imagePullPolicy: Always
           ports:

@@ -16,25 +16,13 @@ spec:
         app: yearning
     spec:
       containers:
-        - image: adas-hub.nioint.com/juno:latest
-          name: juno
-          imagePullPolicy: IfNotPresent
-          env:
-           - name: MYSQL_ADDR
-             value: "10.130.114.44:30999"
-           - name: MYSQL_USER
-             value: "root"
-           - name: MYSQL_PASSWORD
-             value: "root"
-           - name: MYSQL_DB
-             value: "Yearning"
-          ports:
-            - containerPort: 50001
-              name: web
-              protocol: TCP
-        - image: adas-hub.nioint.com/yearning:latest
+        - image: adas-hub.nioint.com/yearning:v0.3
           name: yearning
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
+          command:
+            - /bin/bash
+            - -c
+            - "./Yearning install && ./Yearning run"
           env:
             - name: MYSQL_ADDR
               value: "10.130.114.44:30999"
@@ -44,6 +32,10 @@ spec:
               value: "root"
             - name: MYSQL_DB
               value: "Yearning"
+            - name: IS_DOCKER
+              value: "docker"
+            - name: SECRET_KEY
+              value: "dbcjqheupqjsuwsm"
           ports:
             - containerPort: 8000
               name: web
@@ -62,6 +54,13 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 2
+        - image: adas-hub.nioint.com/juno:v0.1
+          name: juno
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 50001
+              name: web
+              protocol: TCP
           resources:
             requests:
               cpu: 200m
@@ -69,3 +68,19 @@ spec:
             limits:
               cpu: 250m
               memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yearning-svc
+  namespace: foundation
+spec:
+  selector:
+    app: yearning
+  ports:
+    - name: yearning
+      port: 80
+      protocol: TCP
+      targetPort: 8000
+  sessionAffinity: None
+  type: ClusterIP

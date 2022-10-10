@@ -74,6 +74,8 @@ kind: Service
 metadata:
   name: yearning-svc
   namespace: foundation
+  annotations:
+    service.kubernetes.io/qcloud-loadbalancer-internal-subnetid: subnet-2hvywfvb
 spec:
   selector:
     app: yearning
@@ -83,4 +85,4 @@ spec:
       protocol: TCP
       targetPort: 8000
   sessionAffinity: None
-  type: ClusterIP
+  type: LoadBalancer

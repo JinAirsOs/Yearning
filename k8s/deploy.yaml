@@ -16,7 +16,7 @@ spec:
         app: yearning
     spec:
       containers:
-        - image: repositories.nioint.com/adas/yearning:v0.3.0
+        - image: repositories.nioint.com/adas/yearning:v0.3.2
           name: yearning
           imagePullPolicy: Always
           command:

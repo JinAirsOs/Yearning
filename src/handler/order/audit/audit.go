@@ -72,7 +72,7 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 
 	username := u.Context["applier"].(string)
 
-	c.Logger().Infof("parsed param ", confirm.WorkId, username)
+	logger.DefaultLogger.Infof("parsed param ", confirm.WorkId, username)
 	flowDetail, err := lib.CallBackWorkflowInstance(u.FlowInstanceID, username)
 	if err != nil {
 		c.Logger().Error("call get workflow instance failed" + err.Error())

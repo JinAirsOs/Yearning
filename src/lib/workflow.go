@@ -131,7 +131,10 @@ func CreateWorkflowInstance(order *model.CoreSqlOrder, user *Token) (workflowID 
 	var env string
 	if strings.Contains(order.Source, "prod") {
 		env = "prod"
+	} else {
+		env = order.Source
 	}
+
 	req.Context["env"] = env
 
 	req.Context["dataSource"] = order.Source

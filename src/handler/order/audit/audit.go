@@ -79,9 +79,11 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 				case "accept":
 					taskStatus = task.Status
 					operators = append(operators, task.Operator)
+					break
 				case "deny":
 					taskStatus = task.Status
 					operators = append(operators, task.Operator)
+					break
 				default:
 					taskStatus = task.Status
 				}
@@ -112,16 +114,9 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 			Data:       map[string]string{},
 		})
 	default:
-		env := u.Context["env"].(string)
-		if env != "prod" {
-			OpenAuditOrder(confirm, auditUser)
-			return c.JSON(http.StatusOK, lib.WorkflowResponse{
-				RequestID:  "uuid",
-				ResultCode: "success",
-				Data:       map[string]string{},
-			})
-		}
-		return c.JSON(http.StatusBadRequest, lib.WorkflowResponse{
+		//自己为自己的审批人情形
+		OpenAuditOrder(confirm, auditUser)
+		return c.JSON(http.StatusOK, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
 			Data:       map[string]string{},

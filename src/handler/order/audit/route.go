@@ -9,3 +9,9 @@ func AuditRestFulAPis() yee.RestfulAPI {
 		Put:  AuditOrRecordOrderFetchApis,
 	}
 }
+
+func OpenAuditRestFulAPis() yee.RestfulAPI {
+	return yee.RestfulAPI{
+		Post: OpenAuditOrderApis,
+	}
+}

@@ -57,10 +57,18 @@ func sqlOrderPost(c yee.Context) (err error) {
 	})
 
 	lib.MessagePush(u.WorkId, 2, "")
-
 	if u.Type == lib.DML {
 		CallAutoTask(u, length)
 	}
+
+	workflowId, err := lib.CreateWorkflowInstance(u, user)
+	if err != nil {
+		return c.JSON(http.StatusOK, common.ERR_COMMON_MESSAGE(err))
+	}
+
+	u.WorkflowID = workflowId
+
+	model.DB().Save(u)
 
 	return c.JSON(http.StatusOK, common.SuccessPayLoadToMessage(ORDER_POST_SUCCESS))
 }

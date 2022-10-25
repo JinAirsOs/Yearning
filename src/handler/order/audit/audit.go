@@ -34,6 +34,93 @@ func AuditOrderState(c yee.Context) (err error) {
 	}
 }
 
+type WorkflowCallBackParam struct {
+	Context map[string]string `json:"context"`
+	//"deny" "success"
+	Status           string `json:"status"`
+	CurrentNodeName  string `json:"current_node_name"`
+	PreviousNodeName string `json:"previous_node_name"`
+	FlowInstanceID   string `json:"flow_instance_id"`
+}
+
+//返回
+//{
+//    "request_id": "6bd85fce-8de9-4116-bf2a-acb891f443f2",
+//    "result_code": "success",
+//    "data": {
+//        "context": {
+//            "day": "123"
+//        }
+//    }
+//}
+
+func OpenAuditOrderState(c yee.Context) (err error) {
+	c.Logger().Info("workflow callback................")
+	u := new(WorkflowCallBackParam)
+	//user := new(lib.Token).JwtParse(c)
+	if err = c.Bind(u); err != nil {
+		c.Logger().Error(err.Error())
+		return c.JSON(http.StatusOK, common.ERR_REQ_BIND)
+	}
+
+	confirm := new(Confirm)
+
+	confirm.WorkId = u.Context["flowID"]
+
+	username := u.Context["applier"]
+
+	flowDetail, err := lib.CallBackWorkflowInstance(u.FlowInstanceID, username)
+	if err != nil {
+		return c.JSON(http.StatusOK, lib.WorkflowResponse{
+			RequestID:  "uuid",
+			ResultCode: "success",
+			Data:       u.Context,
+		})
+	}
+
+	var operators []lib.FlowOperator
+	for _, node := range flowDetail.Nodes {
+		if node.FlowInstanceNodeTitle == "审批" {
+			for _, task := range node.Tasks {
+				switch task.Status {
+				case "deny", "success":
+					operators = append(operators, task.Operator)
+				default:
+				}
+			}
+		}
+	}
+
+	auditUser := username
+
+	if len(operators) > 0 {
+		auditUser = operators[0].UserName
+	}
+
+	switch u.Status {
+	case "success":
+		OpenAuditOrder(confirm, auditUser)
+		return c.JSON(http.StatusOK, lib.WorkflowResponse{
+			RequestID:  "uuid",
+			ResultCode: "success",
+			Data:       u.Context,
+		})
+	case "deny":
+		RejectOrder(confirm, auditUser)
+		return c.JSON(http.StatusOK, lib.WorkflowResponse{
+			RequestID:  "uuid",
+			ResultCode: "success",
+			Data:       u.Context,
+		})
+	default:
+		return c.JSON(http.StatusOK, lib.WorkflowResponse{
+			RequestID:  "uuid",
+			ResultCode: "success",
+			Data:       u.Context,
+		})
+	}
+}
+
 // DelayKill will stop delay order
 func DelayKill(c yee.Context) (err error) {
 	u := new(Confirm)
@@ -102,6 +189,10 @@ func AuditOrderApis(c yee.Context) (err error) {
 	default:
 		return c.JSON(http.StatusOK, common.ERR_REQ_FAKE)
 	}
+}
+
+func OpenAuditOrderApis(c yee.Context) (err error) {
+	return OpenAuditOrderState(c)
 }
 
 func AuditOrRecordOrderFetchApis(c yee.Context) (err error) {

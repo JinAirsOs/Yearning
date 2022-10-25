@@ -120,4 +120,11 @@ func AddRouter(e *yee.Core) {
 
 	autoTask := manager.Group("/task")
 	autoTask.Restful("", autoTask2.SuperAutoTaskApis())
+
+	openapi := e.Group("/openapi/v1")
+
+	workflow := openapi.Group("/workflow")
+
+	workflow.Restful("/order", audit2.OpenAuditRestFulAPis())
+
 }

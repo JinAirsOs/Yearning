@@ -103,6 +103,7 @@ type CoreSqlOrder struct {
 	Relevant    JSON   `gorm:"type:json" json:"relevant"`
 	OSCInfo     string `gorm:"type:longtext;default ''" json:"osc_info"`
 	File        string `gorm:"type:varchar(200);not null;default ''" json:"file"`
+	WorkflowID  string `gorm:"type:varchar(200);not null;default ''" json:"workflow_id"`
 }
 
 type CoreRollback struct {

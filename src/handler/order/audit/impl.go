@@ -109,6 +109,10 @@ func MultiAuditOrder(req *Confirm, user string) common.Resp {
 	return common.ERR_COMMON_MESSAGE(errors.New(ORDER_NOT_SEARCH))
 }
 
+func OpenAuditOrder(req *Confirm, user string) common.Resp {
+	return ExecuteOrder(req, user)
+}
+
 func RejectOrder(u *Confirm, user string) common.Resp {
 	model.DB().Model(&model.CoreSqlOrder{}).Where("work_id =?", u.WorkId).Updates(map[string]interface{}{"status": 0})
 	model.DB().Create(&model.CoreWorkflowDetail{

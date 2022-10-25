@@ -317,7 +317,7 @@ type FlowOperator struct {
 func CallBackWorkflowInstance(workflowInstanceID string, username string) (*FlowDetail, error) {
 
 	url := WORKFLOW_API + "/api/v1/instance/" + workflowInstanceID
-
+	logger.DefaultLogger.Errorf("CallBackWorkflowInstance request: ", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		logger.DefaultLogger.Errorf("request:", err)
@@ -336,7 +336,7 @@ func CallBackWorkflowInstance(workflowInstanceID string, username string) (*Flow
 	resp, err := client.Do(req)
 
 	if err != nil {
-		logger.DefaultLogger.Errorf("resp:", err)
+		logger.DefaultLogger.Errorf("err resp:", url, err)
 		return nil, err
 	}
 
@@ -344,6 +344,7 @@ func CallBackWorkflowInstance(workflowInstanceID string, username string) (*Flow
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+	logger.DefaultLogger.Infof("url resp:", url, string(body))
 	var flowDetail FlowDetail
 	err = json.Unmarshal(body, &flowDetail)
 	if err != nil {

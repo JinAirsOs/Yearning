@@ -317,7 +317,7 @@ type FlowOperator struct {
 func CallBackWorkflowInstance(workflowInstanceID string, username string) (*FlowDetail, error) {
 
 	url := WORKFLOW_API + "/api/v1/instance/" + workflowInstanceID
-	logger.DefaultLogger.Error("CallBackWorkflowInstance request: " + url)
+	logger.DefaultLogger.Infof("CallBackWorkflowInstance request: " + url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		logger.DefaultLogger.Errorf("request:", err)

@@ -5,6 +5,7 @@ import (
 	"Yearning-go/src/lib"
 	"Yearning-go/src/model"
 	"github.com/cookieY/yee"
+	"github.com/cookieY/yee/logger"
 	"golang.org/x/net/websocket"
 	"net/http"
 	"time"
@@ -101,25 +102,24 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 		auditUser = operators[0].UserName
 	}
 
-	c.Logger().Info("audit user: " + auditUser)
-
+	logger.DefaultLogger.Errorf("audituser: " + auditUser + "status:" + u.Status)
 	switch u.Status {
 	case "success":
 		OpenAuditOrder(confirm, auditUser)
-		return c.JSON(http.StatusOK, lib.WorkflowResponse{
+		return c.JSON(http.StatusBadRequest, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
 			Data:       map[string]string{},
 		})
 	case "deny":
 		RejectOrder(confirm, auditUser)
-		return c.JSON(http.StatusOK, lib.WorkflowResponse{
+		return c.JSON(http.StatusBadGateway, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
 			Data:       map[string]string{},
 		})
 	default:
-		return c.JSON(http.StatusOK, lib.WorkflowResponse{
+		return c.JSON(http.StatusBadRequest, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
 			Data:       map[string]string{},

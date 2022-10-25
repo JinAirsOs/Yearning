@@ -345,12 +345,17 @@ func CallBackWorkflowInstance(workflowInstanceID string, username string) (*Flow
 
 	body, err := ioutil.ReadAll(resp.Body)
 	logger.DefaultLogger.Infof("url resp:", url, string(body))
-	var flowDetail FlowDetail
+	type FlowDetailResp struct {
+		RequestID  string     `json:"request_id"`
+		ResultCode string     `json:"result_code"`
+		Data       FlowDetail `json:"data"`
+	}
+	var flowDetail FlowDetailResp
 	err = json.Unmarshal(body, &flowDetail)
 	if err != nil {
 		logger.DefaultLogger.Errorf("unmarshal err:", err)
 		return nil, err
 	}
 
-	return &flowDetail, nil
+	return &flowDetail.Data, nil
 }

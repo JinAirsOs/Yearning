@@ -106,19 +106,28 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 	switch u.Status {
 	case "success":
 		OpenAuditOrder(confirm, auditUser)
-		return c.JSON(http.StatusBadRequest, lib.WorkflowResponse{
+		return c.JSON(http.StatusOK, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
 			Data:       map[string]string{},
 		})
 	case "deny":
 		RejectOrder(confirm, auditUser)
-		return c.JSON(http.StatusBadGateway, lib.WorkflowResponse{
+		return c.JSON(http.StatusOK, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
 			Data:       map[string]string{},
 		})
 	default:
+		env := u.Context["env"].(string)
+		if env != "prod" {
+			OpenAuditOrder(confirm, auditUser)
+			return c.JSON(http.StatusOK, lib.WorkflowResponse{
+				RequestID:  "uuid",
+				ResultCode: "success",
+				Data:       map[string]string{},
+			})
+		}
 		return c.JSON(http.StatusBadRequest, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",

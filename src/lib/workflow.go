@@ -286,10 +286,10 @@ func CreateWorkflowInstance(order *model.CoreSqlOrder, user *Token) (workflowID 
 //        ]
 //    }
 type FlowDetail struct {
-	FlowName       string            `json:"flow_name"`
-	FlowInstanceID string            `json:"flow_instance_id"`
-	Status         string            `json:"status"`
-	Context        map[string]string `json:"context"`
+	FlowName       string                 `json:"flow_name"`
+	FlowInstanceID string                 `json:"flow_instance_id"`
+	Status         string                 `json:"status"`
+	Context        map[string]interface{} `json:"context"`
 
 	Nodes []FlowNode `json:"nodes"`
 }
@@ -317,7 +317,7 @@ type FlowOperator struct {
 func CallBackWorkflowInstance(workflowInstanceID string, username string) (*FlowDetail, error) {
 
 	url := WORKFLOW_API + "/api/v1/instance/" + workflowInstanceID
-	logger.DefaultLogger.Errorf("CallBackWorkflowInstance request: ", url)
+	logger.DefaultLogger.Error("CallBackWorkflowInstance request: " + url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		logger.DefaultLogger.Errorf("request:", err)

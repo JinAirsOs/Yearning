@@ -136,6 +136,7 @@ func CreateWorkflowInstance(order *model.CoreSqlOrder, user *Token) (workflowID 
 	}
 
 	req.Context["env"] = env
+	req.Context["text"] = order.Text
 
 	req.Context["dataSource"] = order.Source
 
@@ -166,128 +167,6 @@ func CreateWorkflowInstance(order *model.CoreSqlOrder, user *Token) (workflowID 
 	return data["flow_instance_id"], nil
 }
 
-//{
-//        "flow_code": "7a5ebe44-0ee2-40b1-add4-cd8e315d302f",
-//        "flow_name": "小欣的测试5-13",
-//        "flow_description": "小欣的测试5-13",
-//        "creator": "shingu.gu",
-//        "flow_instance_id": "XXDCSH-2022052800798-7900",
-//        "status": "processing",
-//        "created_time": 1653667283000,
-//        "status_name": "processing",
-//        "context": {
-//            "day": "122",
-//            "age": "",
-//            "workflow_created_time": "1653667283624",
-//            "workflow_creator": "shingu.gu"
-//        },
-//        "meta_data": [
-//            {
-//                "name": "day",
-//                "type": "string",
-//                "field": "day",
-//                "type_code": "Input"
-//            },
-//            {
-//                "name": "age",
-//                "type": "string",
-//                "field": "age",
-//                "type_code": "Input"
-//            }
-//        ],
-//        "nodes": [
-//            {
-//                "name": "start",
-//                "next": [
-//                    "bnzR3EspmPpwvFWdQPPR"
-//                ],
-//                "flowInstanceNodeType": "start",
-//                "flowTemplateNodeId": "start",
-//                "flowInstanceId": "XXDCSH-2022052800798-7900",
-//                "id": 568,
-//                "flow_instace_id": "XXDCSH-2022052800798-7900",
-//                "flow_instance_node_id": "d148cf05-361c-45a3-9d90-a6930fdea470",
-//                "status": "accept",
-//                "flow_template_node_id": "start",
-//                "flow_instance_node_type": "start",
-//                "start_time": 1653667283000,
-//                "end_time": 0,
-//                "tasks": [],
-//                "extra_info": {},
-//                "flow_instance_node_name": "start",
-//                "operator": []
-//            },
-//            {
-//                "name": "bnzR3EspmPpwvFWdQPPR",
-//                "next": [
-//                    "end"
-//                ],
-//                "type": "normal",
-//                "operator": [
-//                    {
-//                        "user_name": "Shingu GU （顾小欣）",
-//                        "worker_user_id": "shingu.gu"
-//                    }
-//                ],
-//                "flowInstanceNodeRule": "or",
-//                "flowInstanceNodeTitle": "审批人bnzR3",
-//
-//                "flowInstanceNodeType": "normal",
-//                "flowTemplateNodeId": "bnzR3EspmPpwvFWdQPPR",
-//                "flowInstanceId": "XXDCSH-2022052800798-7900",
-//                "id": 569,
-//                "flow_instace_id": "XXDCSH-2022052800798-7900",
-//                "flow_instance_node_id": "2c4a8ae5-6bf4-4732-9a90-46d1fdfb8e0f",
-//                "status": "processing",
-//                "flow_template_node_id": "bnzR3EspmPpwvFWdQPPR",
-//                "flow_instance_node_type": "normal",
-//                "start_time": 1653667283000,
-//                "end_time": 0,
-//                "flow_instance_node_rule": "or",
-//                "flow_instance_node_title": "审批人bnzR3",
-//                "tasks": [
-//                    {
-//                        "operator": {
-//                            "user_name": "Shingu GU （顾小欣）",
-//                            "worker_user_id": "shingu.gu"
-//                        },
-//                        "status": "processing",
-//                        "origin_operator": "",
-//                        "task_id": "2647d55d-dc33-4b8f-a7f0-7080b089fe72",
-//                        "extra_info": null,
-//                        "start_time": 1653667284000,
-//                        "end_time": 0
-//                    }
-//                ],
-//                "extra_info": {},
-//                "flow_instance_node_name": "bnzR3EspmPpwvFWdQPPR"
-//            },
-//            {
-//                "name": "end",
-//                "next": [],
-//                "flowInstanceNodeType": "end",
-//                "flowTemplateNodeId": "end",
-//                "flowInstanceId": "XXDCSH-2022052800798-7900",
-//                "flow_instace_id": "XXDCSH-2022052800798-7900",
-//                "flow_instance_node_id": "cc14a584-dcd7-4f00-8b16-ad73286bf71e",
-//                "flow_template_node_id": "end",
-//                "flow_instance_node_type": "end",
-//                "is_forcast": true,
-//                "tasks": [],
-//                "extra_info": {},
-//                "flow_instance_node_name": "end",
-//                "operator": []
-//            }
-//        ],
-//        "attachments": [
-//            {
-//                "type": "",
-//                "url": "http://www.nio.com/1.jpg",
-//                "filename": "icon",
-//                "id": "jpg"
-//            }
-//        ]
-//    }
 type FlowDetail struct {
 	FlowName       string                 `json:"flow_name"`
 	FlowInstanceID string                 `json:"flow_instance_id"`
@@ -308,8 +187,13 @@ type FlowNode struct {
 }
 
 type FlowTask struct {
-	Operator FlowOperator `json:"operator"`
-	Status   string       `json:"status"`
+	Operator  FlowOperator `json:"operator"`
+	Status    string       `json:"status"`
+	ExtraInfo ExtraInfo    `json:"extra_info"`
+}
+
+type ExtraInfo struct {
+	Comment string `json:"comment"`
 }
 
 type FlowOperator struct {

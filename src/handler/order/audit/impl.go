@@ -84,6 +84,12 @@ func ExecuteOrder(u *Confirm, user string) common.Resp {
 			Time:     time.Now().Format("2006-01-02 15:04"),
 			Action:   ORDER_EXECUTE_STATE,
 		})
+		model.DB().Create(&model.CoreOrderComment{
+			WorkId:   u.WorkId,
+			Username: user,
+			Content:  fmt.Sprintf("通过详情: %s", u.Text),
+			Time:     time.Now().Format("2006-01-02 15:04"),
+		})
 		model.DB().Model(model.CoreSqlOrder{}).Where("work_id =?", u.WorkId).Updates(&model.CoreSqlOrder{Status: 1})
 		return common.SuccessPayLoadToMessage(ORDER_EXECUTE_STATE)
 	}

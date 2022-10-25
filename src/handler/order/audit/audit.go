@@ -79,10 +79,12 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 				case "accept":
 					taskStatus = task.Status
 					operators = append(operators, task.Operator)
+					confirm.Text = task.ExtraInfo.Comment
 					break
 				case "deny":
 					taskStatus = task.Status
 					operators = append(operators, task.Operator)
+					confirm.Text = task.ExtraInfo.Comment
 					break
 				default:
 					taskStatus = task.Status

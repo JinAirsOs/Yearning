@@ -44,19 +44,6 @@ type WorkflowCallBackParam struct {
 	FlowInstanceID   string `json:"flow_instance_id"`
 }
 
-//type WorkflowCallBackParam map[string]string
-
-//返回
-//{
-//    "request_id": "6bd85fce-8de9-4116-bf2a-acb891f443f2",
-//    "result_code": "success",
-//    "data": {
-//        "context": {
-//            "day": "123"
-//        }
-//    }
-//}
-
 func OpenAuditOrderState(c yee.Context) (err error) {
 	c.Logger().Info("workflow callback................")
 	u := new(WorkflowCallBackParam)
@@ -84,13 +71,19 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 	}
 
 	var operators []lib.FlowOperator
+	var taskStatus string
 	for _, node := range flowDetail.Nodes {
 		if node.FlowInstanceNodeTitle == "审批" {
 			for _, task := range node.Tasks {
 				switch task.Status {
-				case "deny", "success":
+				case "accept":
+					taskStatus = task.Status
+					operators = append(operators, task.Operator)
+				case "deny":
+					taskStatus = task.Status
 					operators = append(operators, task.Operator)
 				default:
+					taskStatus = task.Status
 				}
 			}
 		}
@@ -103,8 +96,8 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 	}
 
 	logger.DefaultLogger.Errorf("audituser: " + auditUser + "status:" + u.Status)
-	switch u.Status {
-	case "success":
+	switch taskStatus {
+	case "accept":
 		OpenAuditOrder(confirm, auditUser)
 		return c.JSON(http.StatusOK, lib.WorkflowResponse{
 			RequestID:  "uuid",

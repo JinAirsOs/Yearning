@@ -300,7 +300,7 @@ type FlowDetail struct {
 type FlowNode struct {
 	Name string `json:"name"`
 	//"审批"
-	FlowInstanceNodeTitle string `json:"flowInstanceNodeTitle"`
+	FlowInstanceNodeTitle string `json:"flow_instance_node_title"`
 	//eg. "or"
 	FlowInstanceNodeRule string `json:"flow_instance_node_rule"`
 

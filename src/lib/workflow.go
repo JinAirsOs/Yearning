@@ -151,11 +151,16 @@ func CreateWorkflowInstance(order *model.CoreSqlOrder, user *Token) (workflowID 
 		WorkflowInstanceID string `json:"flow_instance_id"`
 	}
 
-	if x, ok := resp.Data.(CreateWorkflowInstanceResp); ok {
-		return x.WorkflowInstanceID, nil
-	} else {
+	data := make(map[string]string)
+
+	v, _ := json.Marshal(resp.Data)
+
+	err = json.Unmarshal(v, &data)
+	if err != nil {
 		return "", errors.New("typo: not type of CreateWorkflowInstanceResp")
 	}
+
+	return data["flow_instance_id"], nil
 }
 
 //{

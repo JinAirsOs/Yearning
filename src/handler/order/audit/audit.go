@@ -43,6 +43,8 @@ type WorkflowCallBackParam struct {
 	FlowInstanceID   string `json:"flow_instance_id"`
 }
 
+//type WorkflowCallBackParam map[string]string
+
 //返回
 //{
 //    "request_id": "6bd85fce-8de9-4116-bf2a-acb891f443f2",
@@ -56,8 +58,8 @@ type WorkflowCallBackParam struct {
 
 func OpenAuditOrderState(c yee.Context) (err error) {
 	c.Logger().Info("workflow callback................")
-	u := new(WorkflowCallBackParam)
-	//user := new(lib.Token).JwtParse(c)
+	u := make(map[string]string)
+
 	if err = c.Bind(u); err != nil {
 		c.Logger().Error(err.Error())
 		return c.JSON(http.StatusOK, common.ERR_REQ_BIND)
@@ -65,16 +67,17 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 
 	confirm := new(Confirm)
 
-	confirm.WorkId = u.Context["flowID"]
+	confirm.WorkId = u["flowID"]
 
-	username := u.Context["applier"]
+	username := u["applier"]
 
-	flowDetail, err := lib.CallBackWorkflowInstance(u.FlowInstanceID, username)
+	flowDetail, err := lib.CallBackWorkflowInstance(u["flow_instance_id"], username)
 	if err != nil {
-		return c.JSON(http.StatusOK, lib.WorkflowResponse{
+		c.Logger().Error("call get workflow instance failed" + err.Error())
+		return c.JSON(http.StatusBadRequest, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
-			Data:       u.Context,
+			Data:       map[string]string{},
 		})
 	}
 
@@ -97,26 +100,28 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 		auditUser = operators[0].UserName
 	}
 
-	switch u.Status {
+	c.Logger().Info("audit user: " + auditUser)
+
+	switch u["status"] {
 	case "success":
 		OpenAuditOrder(confirm, auditUser)
 		return c.JSON(http.StatusOK, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
-			Data:       u.Context,
+			Data:       map[string]string{},
 		})
 	case "deny":
 		RejectOrder(confirm, auditUser)
 		return c.JSON(http.StatusOK, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
-			Data:       u.Context,
+			Data:       map[string]string{},
 		})
 	default:
 		return c.JSON(http.StatusOK, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
-			Data:       u.Context,
+			Data:       map[string]string{},
 		})
 	}
 }

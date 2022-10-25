@@ -35,7 +35,7 @@ func AuditOrderState(c yee.Context) (err error) {
 }
 
 type WorkflowCallBackParam struct {
-	Context map[string]string `json:"context"`
+	Context map[string]interface{} `json:"context"`
 	//"deny" "success"
 	Status           string `json:"status"`
 	CurrentNodeName  string `json:"current_node_name"`
@@ -58,7 +58,7 @@ type WorkflowCallBackParam struct {
 
 func OpenAuditOrderState(c yee.Context) (err error) {
 	c.Logger().Info("workflow callback................")
-	u := make(map[string]string)
+	u := new(WorkflowCallBackParam)
 
 	if err = c.Bind(u); err != nil {
 		c.Logger().Error(err.Error())
@@ -67,11 +67,11 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 
 	confirm := new(Confirm)
 
-	confirm.WorkId = u["flowID"]
+	confirm.WorkId = u.Context["flowID"].(string)
 
-	username := u["applier"]
+	username := u.Context["applier"].(string)
 
-	flowDetail, err := lib.CallBackWorkflowInstance(u["flow_instance_id"], username)
+	flowDetail, err := lib.CallBackWorkflowInstance(u.FlowInstanceID, username)
 	if err != nil {
 		c.Logger().Error("call get workflow instance failed" + err.Error())
 		return c.JSON(http.StatusBadRequest, lib.WorkflowResponse{
@@ -102,7 +102,7 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 
 	c.Logger().Info("audit user: " + auditUser)
 
-	switch u["status"] {
+	switch u.Status {
 	case "success":
 		OpenAuditOrder(confirm, auditUser)
 		return c.JSON(http.StatusOK, lib.WorkflowResponse{

@@ -48,7 +48,6 @@ func WorkflowSign(url, appID string, appSecret string) string {
 }
 
 func SendWorkflowRequest(msg *WorkflowRequest, path string, username string) (*WorkflowResponse, error) {
-	//请求地址模板
 
 	//创建一个请求
 	url := WorkflowSign(WORKFLOW_API+path, "100678", "appSecret") + username
@@ -217,7 +216,6 @@ func CallBackWorkflowInstance(workflowInstanceID string, username string) (*Flow
 
 	client := &http.Client{Transport: tr}
 	//设置请求头
-	//req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("X-Domain-Id", username)
 	//发送请求
 	resp, err := client.Do(req)
@@ -245,4 +243,40 @@ func CallBackWorkflowInstance(workflowInstanceID string, username string) (*Flow
 	}
 
 	return &flowDetail.Data, nil
+}
+
+func RevokeWorkflow(workID string, username string) error {
+	var order model.CoreSqlOrder
+	model.DB().Where("work_id = ?", workID).Find(&order)
+	url := WORKFLOW_API + "/api/v1/instance/" + order.WorkflowID + "/revoke"
+	logger.DefaultLogger.Infof("RevokeWorkflow request: " + url)
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		logger.DefaultLogger.Errorf("request:", err)
+		return err
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	client := &http.Client{Transport: tr}
+	//设置请求头
+	req.Header.Set("X-Domain-Id", username)
+	//发送请求
+	resp, err := client.Do(req)
+
+	if err != nil {
+		logger.DefaultLogger.Errorf("err resp:", url, err)
+		return err
+	}
+
+	//关闭请求
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return errors.New("err response")
+	}
+	
+	return nil
 }

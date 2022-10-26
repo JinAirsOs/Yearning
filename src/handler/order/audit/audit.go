@@ -25,6 +25,10 @@ func AuditOrderState(c yee.Context) (err error) {
 	case "undo":
 		lib.MessagePush(u.WorkId, 6, "")
 		model.DB().Model(model.CoreSqlOrder{}).Where("work_id =?", u.WorkId).Updates(&model.CoreSqlOrder{Status: 6})
+		err = lib.RevokeWorkflow(u.WorkId, user.Username)
+		if err != nil {
+			return c.JSON(http.StatusOK, common.ERR_REQ_FAKE)
+		}
 		return c.JSON(http.StatusOK, common.SuccessPayLoadToMessage(common.ORDER_IS_UNDO))
 	case "agree":
 		return c.JSON(http.StatusOK, MultiAuditOrder(u, user.Username))
@@ -71,23 +75,23 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 	}
 
 	var operators []lib.FlowOperator
-	var taskStatus string
+	//var taskStatus string
 	for _, node := range flowDetail.Nodes {
 		if node.FlowInstanceNodeTitle == "审批" {
 			for _, task := range node.Tasks {
 				switch task.Status {
 				case "accept":
-					taskStatus = task.Status
+					//taskStatus = task.Status
 					operators = append(operators, task.Operator)
 					confirm.Text = task.ExtraInfo.Comment
 					break
 				case "deny":
-					taskStatus = task.Status
+					//taskStatus = task.Status
 					operators = append(operators, task.Operator)
 					confirm.Text = task.ExtraInfo.Comment
 					break
 				default:
-					taskStatus = task.Status
+					//taskStatus = task.Status
 				}
 			}
 		}
@@ -100,8 +104,8 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 	}
 
 	logger.DefaultLogger.Errorf("audituser: " + auditUser + "status:" + u.Status)
-	switch taskStatus {
-	case "accept":
+	switch u.Status {
+	case "success":
 		OpenAuditOrder(confirm, auditUser)
 		return c.JSON(http.StatusOK, lib.WorkflowResponse{
 			RequestID:  "uuid",
@@ -115,10 +119,19 @@ func OpenAuditOrderState(c yee.Context) (err error) {
 			ResultCode: "success",
 			Data:       map[string]string{},
 		})
-	default:
-		//自己为自己的审批人情形
-		OpenAuditOrder(confirm, auditUser)
+	case "revoke", "timeout", "error":
+		lib.MessagePush(confirm.WorkId, 6, "流程已被取消")
+		model.DB().Model(model.CoreSqlOrder{}).Where("work_id =?", confirm.WorkId).Updates(&model.CoreSqlOrder{Status: 6})
+
 		return c.JSON(http.StatusOK, lib.WorkflowResponse{
+			RequestID:  "uuid",
+			ResultCode: "success",
+			Data:       map[string]string{},
+		})
+	default:
+		//未预期状态
+		//OpenAuditOrder(confirm, auditUser)
+		return c.JSON(http.StatusBadRequest, lib.WorkflowResponse{
 			RequestID:  "uuid",
 			ResultCode: "success",
 			Data:       map[string]string{},

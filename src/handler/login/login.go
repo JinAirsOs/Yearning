@@ -49,7 +49,7 @@ func UserLdapLogin(c yee.Context) (err error) {
 				Department: ldap.Department,
 				Email:      ldap.Email,
 			})
-			ix, _ := json.Marshal([]string{})
+			ix, _ := json.Marshal([]string{""})
 			model.DB().Create(&model.CoreGrained{Username: u.Username, Group: ix})
 		}
 

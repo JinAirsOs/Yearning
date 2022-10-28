@@ -11,7 +11,7 @@ import (
 )
 
 func setup() {
-	model.DbInit("../../../../conf.toml")
+	model.DBNew("../../../../conf.toml")
 	apis.NewTest()
 }
 

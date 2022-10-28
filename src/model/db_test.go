@@ -30,14 +30,3 @@ func Mock(db *gorm.DB, wg *sync.WaitGroup) {
 	}
 	wg.Done()
 }
-
-func TestMockData(t *testing.T) {
-	var wg sync.WaitGroup
-	db2, _ := gorm.Open("mysql", "root:19931003@tcp(127.0.0.1:3306)/test01?charset=utf8")
-	defer db2.Close()
-	wg.Add(10)
-	for i := 0; i < 10; i++ {
-		go Mock(db2, &wg)
-	}
-	wg.Wait()
-}

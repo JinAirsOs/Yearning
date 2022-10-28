@@ -19,7 +19,7 @@ func SendDingMsg(msg model.Message, sv string) {
 
 	hook := msg.WebHook
 
-	mx = fmt.Sprintf(`{"msgtype": "markdown", "markdown": {"title": "Yearning sql审计平台", "text": "%s"}}`, sv)
+	mx = fmt.Sprintf(`{"msgtype": "markdown", "markdown": {"title": "工单审核平台", "text": "%s"}}`, sv)
 
 	if msg.Key != "" {
 		hook = Sign(msg.Key, msg.WebHook)

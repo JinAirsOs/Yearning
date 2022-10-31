@@ -9,6 +9,7 @@ import (
 	"github.com/cookieY/yee/logger"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -36,9 +37,15 @@ type WorkflowRequest struct {
 }
 
 func NewWorkflowRequest() *WorkflowRequest {
+	flowCode := os.Getenv("FLOWCODE")
+
+	if len(flowCode) == 0 {
+		flowCode = "22792e0b-5aa7-4c7c-b7de-c5fd6ca6fede"
+	}
+
 	return &WorkflowRequest{
 		Creator:  "zhendong.pan",
-		FlowCode: "22792e0b-5aa7-4c7c-b7de-c5fd6ca6fede",
+		FlowCode: flowCode,
 		Context:  make(map[string]string),
 	}
 }
@@ -277,6 +284,6 @@ func RevokeWorkflow(workID string, username string) error {
 	if resp.StatusCode != 200 {
 		return errors.New("err response")
 	}
-	
+
 	return nil
 }

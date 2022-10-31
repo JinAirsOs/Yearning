@@ -90,7 +90,10 @@ func ExecuteOrder(u *Confirm, user string) common.Resp {
 			Content:  fmt.Sprintf("通过详情: %s", u.Text),
 			Time:     time.Now().Format("2006-01-02 15:04"),
 		})
-		model.DB().Model(model.CoreSqlOrder{}).Where("work_id =?", u.WorkId).Updates(&model.CoreSqlOrder{Status: 1})
+		//model.DB().Model(model.CoreSqlOrder{}).Where("work_id =?", u.WorkId).Updates(&model.CoreSqlOrder{Status: 1})
+		order.Status = 1
+		model.DB().Save(order)
+
 		return common.SuccessPayLoadToMessage(ORDER_EXECUTE_STATE)
 	}
 	return common.ERR_RPC

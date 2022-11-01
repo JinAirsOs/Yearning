@@ -123,7 +123,7 @@ func OpenAuditOrder(req *Confirm, user string) common.Resp {
 }
 
 func RejectOrder(u *Confirm, user string) common.Resp {
-	model.DB().Model(&model.CoreSqlOrder{}).Where("work_id =?", u.WorkId).Updates(map[string]interface{}{"status": 0})
+	model.DB().Model(&model.CoreSqlOrder{}).Where("work_id =?", u.WorkId).Updates(map[string]interface{}{"status": 0, "assigned": user})
 	model.DB().Create(&model.CoreWorkflowDetail{
 		WorkId:   u.WorkId,
 		Username: user,

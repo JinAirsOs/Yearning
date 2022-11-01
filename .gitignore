@@ -14,6 +14,7 @@ src/deploy.conf
 src/dist
 src/exportData/*.docx
 src/core/migrations/*.py
+tmp/
 env/
 develop-eggs/
 downloads/

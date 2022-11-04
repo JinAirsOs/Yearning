@@ -13,13 +13,6 @@ import (
 	"strings"
 )
 
-//{
-//    request_id: "xxxxxx",
-//    result_code: "xxx",
-//    data: {
-//    }
-//}
-
 const (
 	WORKFLOW_API string = "https://rocket.nioint.com"
 )
@@ -145,6 +138,7 @@ func CreateWorkflowInstance(order *model.CoreSqlOrder, user *Token) (workflowID 
 	req.Context["text"] = order.Text
 
 	req.Context["dataSource"] = order.Source
+	req.Context["sql"] = SQLFormat(order.SQL)
 
 	resp, err := SendWorkflowRequest(req, "/api/v1/instance/create", user.Username)
 
@@ -171,6 +165,21 @@ func CreateWorkflowInstance(order *model.CoreSqlOrder, user *Token) (workflowID 
 	}
 
 	return data["flow_instance_id"], nil
+}
+
+func SQLFormat(sql string) string {
+	if len(sql) < 255 {
+		return sql
+	}
+
+	sqlSlice := strings.Split(sql, "\n")
+	if len(sqlSlice) > 15 {
+		sqlSlice = sqlSlice[:15]
+	}
+	formatedSQL := strings.Join(sqlSlice, " \n")
+
+	formatedSQL += "----------------------------------------\n 略...... \n"
+	return formatedSQL
 }
 
 type FlowDetail struct {

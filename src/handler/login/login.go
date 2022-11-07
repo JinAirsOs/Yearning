@@ -40,8 +40,8 @@ func UserLdapLogin(c yee.Context) (err error) {
 		return c.JSON(http.StatusOK, common.ERR_COMMON_MESSAGE(err))
 	}
 	if isOk {
-		var account model.CoreAccount
-		if err := model.DB().Where("username = ?", u.Username).First(&account).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		account := new(model.CoreAccount)
+		if err := model.DB().Where("username = ?", u.Username).First(account).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 			model.DB().Create(&model.CoreAccount{
 				Username:   u.Username,
 				RealName:   ldap.RealName,
@@ -51,6 +51,13 @@ func UserLdapLogin(c yee.Context) (err error) {
 			})
 			ix, _ := json.Marshal([]string{""})
 			model.DB().Create(&model.CoreGrained{Username: u.Username, Group: ix})
+		}
+
+		if ldap.RealName != "" {
+			account.RealName = ldap.RealName
+			if account.ID != 0 {
+				model.DB().Save(account)
+			}
 		}
 
 		token, tokenErr := lib.JwtAuth(lib.Token{

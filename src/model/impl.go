@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/cookieY/yee/logger"
 	"gopkg.in/ldap.v3"
+	"strings"
 )
 
 type ALdap struct {
@@ -64,12 +65,15 @@ func (l *ALdap) LdapConnect(user string, pass string, isTest bool) (isOk bool, e
 	}
 
 	userdn := sr.Entries[0].DN
+
 	if err := ld.Bind(userdn, pass); err != nil {
 		return false, err
 	}
 	var lmap ldapMap
+
 	if err := json.Unmarshal([]byte(l.Map), &lmap); err != nil {
 		logger.DefaultLogger.Error(err)
+		l.RealName = ParseNameFromDN(userdn)
 	} else {
 		l.Email = sr.Entries[0].GetAttributeValue(lmap.Email)
 		l.Department = sr.Entries[0].GetAttributeValue(lmap.Department)
@@ -77,4 +81,21 @@ func (l *ALdap) LdapConnect(user string, pass string, isTest bool) (isOk bool, e
 	}
 
 	return true, nil
+}
+
+func ParseNameFromDN(userdn string) string {
+	strs := strings.Split(userdn, ",")
+	if len(strs) < 2 {
+		return ""
+	}
+	ss := strings.Split(strs[0], "=")
+	if len(ss) < 2 {
+		return ""
+	}
+
+	if ss[0] == "CN" {
+		return ss[1]
+	}
+
+	return ""
 }

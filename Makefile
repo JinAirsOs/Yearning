@@ -4,4 +4,6 @@ release:
 clean:
 	rm -rf tmp/
 	rm -rf src/service/dist
+test:
+	go test ./...
 .PHONY: release

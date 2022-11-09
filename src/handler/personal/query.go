@@ -175,14 +175,17 @@ func SocketQueryResults(c yee.Context) (err error) {
 					break
 				}
 				switch msg.Ref.Type {
+				//2
 				case QUERY_PING:
 					_ = websocket.Message.Send(ws, lib.ToMsg(queryResults{HeartBeat: common.PING, IsOnly: model.GloOther.Query}))
 					continue
+				//1
 				case QUERY_CLOSE:
 					if core.db != nil {
 						_ = core.db.Close()
 					}
 					break
+				//3
 				case QUERY_OPEN:
 					var u model.CoreDataSource
 					model.DB().Where("source_id =?", args.SourceId).First(&u)

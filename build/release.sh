@@ -5,7 +5,7 @@ set -ex
 
 cd $(dirname "$0")/..
 
-TAG=v3.1.16
+TAG=v3.1.17
 REGISTRY=adas-hub.nioint.com
 
 rm -rf tmp && mkdir tmp

@@ -6,6 +6,7 @@ import (
 	"Yearning-go/src/model"
 	"github.com/cookieY/yee"
 	"net/http"
+	"strings"
 )
 
 type board struct {
@@ -42,12 +43,17 @@ func GetQueryRecords(c yee.Context) (err error) {
 	m := make(map[string]bool)
 	var s []string
 	for _, v := range result {
-		if m[v.Sql] {
+		trimedSql := trim(v.Sql)
+		if m[trimedSql] {
 			continue
 		}
-		m[v.Sql] = true
-		s = append(s, v.Sql)
+		m[trimedSql] = true
+		s = append(s, trimedSql)
 	}
 
 	return c.JSON(http.StatusOK, common.SuccessPayload(s))
+}
+
+func trim(s string) string {
+	return strings.Trim(s, "\n")
 }

@@ -85,6 +85,7 @@ func AddRouter(e *yee.Core) {
 	r.Restful("/fetch/:tp", apis.YearningFetchApis())
 	r.Restful("/query/:tp", apis.YearningQueryApis())
 	r.GET("/board/get", manage.GeneralGetBoard)
+	r.GET("/sql/query/records", manage.GetQueryRecords)
 
 	audit := r.Group("/audit")
 	audit.Restful("/order/:tp", audit2.AuditRestFulAPis())

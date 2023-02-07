@@ -2,6 +2,7 @@ package manage
 
 import (
 	"Yearning-go/src/handler/common"
+	"Yearning-go/src/lib"
 	"Yearning-go/src/model"
 	"github.com/cookieY/yee"
 	"net/http"
@@ -27,4 +28,26 @@ func GeneralGetBoard(c yee.Context) (err error) {
 	var board model.CoreGlobalConfiguration
 	model.DB().Select("board").First(&board)
 	return c.JSON(http.StatusOK, common.SuccessPayload(board.Board))
+}
+
+type Result struct {
+	Sql string
+}
+
+func GetQueryRecords(c yee.Context) (err error) {
+	t := new(lib.Token).JwtParse(c)
+
+	var result []Result
+	model.DB().Raw("select * from core_query_orders a left join core_query_records b on a.work_id=b.work_id where a.username= ? and b.sql is not NULL order by a.id desc limit 1000", t.Username).Scan(&result)
+	m := make(map[string]bool)
+	var s []string
+	for _, v := range result {
+		if m[v.Sql] {
+			continue
+		}
+		m[v.Sql] = true
+		s = append(s, v.Sql)
+	}
+
+	return c.JSON(http.StatusOK, common.SuccessPayload(s))
 }

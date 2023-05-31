@@ -92,10 +92,5 @@ func ParseNameFromDN(userdn string) string {
 	if len(ss) < 2 {
 		return ""
 	}
-
-	if ss[0] == "CN" {
-		return ss[1]
-	}
-
-	return ""
+	return ss[1]
 }
